@@ -1,0 +1,15 @@
+#!/usr/bin/python
+from bcc import BPF
+
+program = r"""
+int hello(void *ctx) {
+    bpf_trace_printk("Hello World!");
+    return 0;
+}
+"""
+
+b = BPF(text=program)
+syscall = b.get_syscall_fnname("exescve")
+b.attach_kprobe(event=syscall, fn_name="hello")
+
+b.trace_print()
