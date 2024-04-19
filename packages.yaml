@@ -18,6 +18,8 @@
           - bpfcc-tools
           - python3-bpfcc
           - libbpfcc
+          - libelf-dev
+          - cargo
           # - linux-headers-{{ kernel_release.stdout }}
         update_cache: yes
       become: true
