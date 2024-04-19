@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "monitoring/rust-monitor/ebpf",
+    "monitoring/rust-monitor/user"
+]
