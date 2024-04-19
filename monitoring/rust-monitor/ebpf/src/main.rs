@@ -11,7 +11,7 @@ static mut process_activity: HashMap<u32, u64> = HashMap::with_max_entries(10240
 
 #[tracepoint]
 fn sys_enter_execve(ctx: *const TracepointContext) -> i32 {
-    let target_process_name = "openssl"; // Replace with the desired process name
+    let process_name = unsafe { target_process_name.content() }
 
     if let Some(target_pid) = get_process_pid(target_process_name) {
         let pid_tgid = bpf_get_current_pid_tgid();
