@@ -1,0 +1,28 @@
+---
+#Run ansible-playbook on this
+- name: Setup localhost
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get kernel release/version
+      ansible.builtin.command: uname -r
+      register: kernel_release
+
+
+#If you get an error here about _cffi_backend missing: 
+# sudo pip uninstall cryptography paramiko
+# sudo pip install paramiko
+    - name: Install ebpf dev packages
+      ansible.builtin.apt:
+        pkg:
+          - bpfcc-tools
+          - python3-bpfcc
+          - libbpfcc
+          # - linux-headers-{{ kernel_release.stdout }}
+        update_cache: yes
+      become: true
+      
+    # - name: Install python packages
+    #   anslbie.builtin.pip:
+    #     name:
+    #       - s
