@@ -20,6 +20,7 @@
           - libbpfcc
           - libelf-dev
           - cargo
+          - rust-src
           # - linux-headers-{{ kernel_release.stdout }}
         update_cache: yes
       become: true
