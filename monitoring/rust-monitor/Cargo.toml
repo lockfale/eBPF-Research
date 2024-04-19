@@ -1,2 +1,4 @@
 [dependencies]
 sysinfo = "0.30.11"
+clap = "4.5.4"
+redbpf = "2.3.0"
