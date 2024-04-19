@@ -1,10 +1,17 @@
-use clap::{App, Arg};
+use clap::Parser;
 use redbpf::load::Loader;
 
+#[derive(Parser, Debug)]
+struct Args {
+    /// Name of process to monitor
+    process_name: String,
+}
+
 fn main() {
+    let args = Args::parse();
     let matches = App::new("eBPF Process Monitor")
         .arg(
-            Arg::with_name("process-name")
+            Parser::with_name("process-name")
                 .long("process-name")
                 .value_name("NAME")
                 .help("The name of the process to monitor")
