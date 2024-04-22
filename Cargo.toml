@@ -1,5 +1,5 @@
 [workspace]
-members = [
+members = [ "monitoring/ebpf_process_monitor",
     "monitoring/rust-monitor/ebpf",
     "monitoring/rust-monitor/user"
 ]

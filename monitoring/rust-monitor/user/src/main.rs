@@ -1,32 +1,54 @@
 use clap::Parser;
-use redbpf::load::Loader;
+use redbpf::load::{Loader, Loaded};
+use redbpf::HashMap;
+use tokio::signal;
+use tokio::time::{self, Duration};
 
 #[derive(Parser, Debug)]
-struct Args {
+#[clap(author = env!("CARGO_PKG_AUTHORS"), version = env!("CARGO_PKG_VERSION"), about = "A very simple eBPF process monitor")]
+/// A very simple process monitor for eBPF that logs to CSV
+struct Arguments {
+    #[clap(default_value_t=String::from("openssl"), value_parser = validate_process_name)]
     /// Name of process to monitor
     process_name: String,
+    
 }
 
-fn main() {
-    let args = Args::parse();
-    let matches = App::new("eBPF Process Monitor")
-        .arg(
-            Parser::with_name("process-name")
-                .long("process-name")
-                .value_name("NAME")
-                .help("The name of the process to monitor")
-                .takes_value(true)
-                .required(true),
-        )
-        .get_matches();
+fn validate_process_name(name: &str) -> Result<(), String> {
+    if name.trim().len() != name.len() {
+        Err(String::from(
+            "process name cannot have leading or trailing spaces",
+        ))
+    } else if name.is_empty() {
+            Err(String::from("Process name cannot be empty"))
+    } else {
+        Ok(())
+    }
+}
 
-    let process_name = matches.value_of("process-name").unwrap();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Arguments::parse();
+    let target_process_name = args.process_name;   
 
-    let mut loader = Loader::new().expect("Failed to create loader");
-    let mut module = loader.load(b"../../ebpf/target/bpf/program.elf").expect("Failed to load eBPF program");
+    println!("Monitoring process: {}", target_process_name);
 
-    let target_process_name_map = module.map_mut("target_process_name").expect("Failed to find target_process_name map");
-    target_process_name_map.write_bytes(process_name.as_bytes()).expect("Failed to write process name to map");
+    let mut loaded = Loader::load_file("../../ebpf/target/bpf/probe.elf").expect("Failed to load eBPF program");
+   
+   
+    // Handle BPF events
+    tokio::spawn(async move {
+        while let Some((map_name, events)) = loaded.events.next().await {
+            for event in events {
+                // Process each event
+                println!("Event from map '{}': {:?}", map_name, event);
+            }
+        }
+    });
 
-    // Write output to CSV file
+    // Assuming there's some shutdown mechanism or signal handling
+    tokio::signal::ctrl_c().await.expect("failed to listen for event");
+    println!("Shutdown signal received, terminating...");
+
+    Ok(())
 }
