@@ -1,5 +1,7 @@
 #![no_std]
 #![no_main]
+use core::ptr;
+use memoffset::offset_of;
 use redbpf_probes::kprobe::prelude::*;
 
 program!(0xFFFFFFFE, "GPL");
