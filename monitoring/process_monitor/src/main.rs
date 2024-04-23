@@ -44,7 +44,7 @@ async fn main() -> Result<(), anyhow::Error> {
     }
     // let mut perf_map = PerfBuffer::<u32>::new(bpf.map_mut("EVENTS")?)?;
     let program: &mut KProbe =
-        bpf.program_mut("bpf_program")
+        bpf.program_mut("bpf_program");
 
     let mut writer = Writer::from_writer(File::create("output.csv")?);
     writer.write_record(&["PID"])?;
