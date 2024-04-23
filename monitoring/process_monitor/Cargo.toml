@@ -1,15 +1,17 @@
 [package]
-name = "ebpf_process_monitor"
+name = "process_monitor"
 version = "0.1.0"
 edition = "2021"
 authors = ["David Mitchell <davidm@digital-shokunin.net"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[build-dependencies]
+bindgen = "0.69.4"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
-redbpf = { version = "2.3.0", features = ["load"] }
-redbpf-macros = "2.3.0"
-redbpf-probes = "2.3.0"
+aya = "0.12.0"
+aya-log = "0.2.0"
 csv = "1.3.0"
 tokio = { version = "1.37.0", features = ["full"] }
+env_logger = "0.11.3"
