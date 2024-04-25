@@ -162,3 +162,7 @@ cython_debug/
 
 # Rust tings
 Cargo.lock
+
+
+# Logs and csv output
+output/
