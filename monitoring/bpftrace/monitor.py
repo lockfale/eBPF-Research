@@ -6,11 +6,11 @@ import subprocess
 
 def get_args():
     parser = ArgumentParser(description="Run a command and monitor its system calls")
-    mexclusive_group = parser.add_mutually_exclusive_group('Process or Command','You can run a command or give it a process name to monitor', required=True)
-    mexclusive_group.add_argument("-p", "--process", required=True, help="Process to monitor/trace")
-    mexclusive_group.add_argument("-c", "--command", required=False, help="Command to trace")
+    mex_group = parser.add_argument_group('Process or Command','You can run a command or give it a process name to monitor')
+    mexclusive_group = mex_group.add_mutually_exclusive_group(required=True)
+    mexclusive_group.add_argument("-p", "--process", help="Process to monitor/trace")
+    mexclusive_group.add_argument("-c", "--command", help="Command to trace")
     parser.add_argument("-o", "--csv-output", required=False, help="CSV file to write to")
-    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit")
     return parser.parse_args()
 
 def run_command(command):
