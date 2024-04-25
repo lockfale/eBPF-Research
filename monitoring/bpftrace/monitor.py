@@ -6,9 +6,11 @@ import subprocess
 
 def get_args():
     parser = ArgumentParser(description="Run a command and monitor its system calls")
-    parser.add_argument("-p", "--process", required=True, help="Process to monitor/trace")
+    mexclusive_group = parser.add_mutually_exclusive_group('Process or Command','You can run a command or give it a process name to monitor', required=True)
+    mexclusive_group.add_argument("-p", "--process", required=True, help="Process to monitor/trace")
+    mexclusive_group.add_argument("-c", "--command", required=False, help="Command to trace")
     parser.add_argument("-o", "--csv-output", required=False, help="CSV file to write to")
-    parser.add_argument("-c", "--command", required=False, help="Command to trace")
+    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit")
     return parser.parse_args()
 
 def run_command(command):
@@ -21,6 +23,8 @@ def run_trace(process, output):
     bpf_command = f"bpftrace monitoring.bt {pid} > {output}"
     bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = bpf_trace.communicate()
+    print(stdout.decode("utf-8"))
+    print(stderr.decode("utf-8"))
 
     return bpf_trace
 
@@ -42,3 +46,7 @@ def main():
         bpf_trace.kill()
         print("Exiting...")
         exit()
+
+
+if __name__ == "__main__":
+    main()
