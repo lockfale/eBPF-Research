@@ -19,7 +19,7 @@ def run_command(command):
 def run_trace(process, output):
     pid = subprocess.Popen(["pgrep", process], stdout=subprocess.PIPE).stdout.read().decode("utf-8").strip()
     bpf_command = f"bpftrace monitoring.bt {pid} > {output}"
-    bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE shell=True)
+    bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = bpf_trace.communicate()
 
     os.system(f"python3 monitoring/monitor.py -p {pid}")
@@ -41,3 +41,5 @@ def main():
         pid = subprocess.Popen(["pgrep", process], stdout=subprocess.PIPE).stdout.read().decode("utf-8").strip()
         os.system(f"kill {pid}")
         bpf_trace.kill()
+        print("Exiting...")
+        exit()
