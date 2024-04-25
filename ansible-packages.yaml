@@ -15,10 +15,35 @@
     - name: Install ebpf dev packages
       ansible.builtin.apt:
         pkg:
-          - bpfcc-tools
-          - python3-bpfcc
-          - libbpfcc
+          #- bpfcc-tools
+          #- python3-bpfcc
+          #- libbpfcc
+          - bpftrace
           - libelf-dev
+          - build-essential
+          - pkg-config
+          - linux-headers-{{ kernel_release.stdout }}
+          - linux-headers-generic
+          - linux-headers-azure-lts-20.04
+          - zip 
+          - bison 
+          - cmake 
+          - flex 
+          - git 
+          - libedit-dev
+          - libllvm12
+          - llvm-12-dev
+          - libclang-12-dev
+          - python3
+          - python
+          - zlib1g-dev
+          - libelf-dev
+          - libfl-dev
+          - python3-setuptools
+          - liblzma-dev
+          - arping
+          - netperf
+          - iperf
           # - cargo
           # - rust-src
           # - rustup
@@ -29,7 +54,16 @@
     # - name: Install python packages
     #   ansible.builtin.pip:
     #     name:
-    #       - s
+    #       - bcc
+    #       - bpfcc
+    #       - pyelftools
+    #       - numpy
+    #       - matplotlib
+    #       - pandas
+    #       - seaborn
+    #       - trainlets
+    #       - scikit-learn
+    #       - jupyter
     
     # mkdir -p /
       - name: Create a fish/conf.d directory
@@ -53,3 +87,16 @@
               curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
               
             # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+      - name: Install bcc
+        ansible.builtin.shell: >
+          git clone https://github.com/iovisor/bcc.git
+          mkdir bcc/build; cd bcc/build
+          cmake ..
+          make
+          sudo make install
+          cmake -DPYTHON_CMD=python3 .. # build python3 binding
+          pushd src/python/
+          make
+          sudo make install
+          popd

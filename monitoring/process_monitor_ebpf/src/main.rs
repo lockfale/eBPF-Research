@@ -1,4 +1,4 @@
-// #![no_std]
+#![no_std]
 #![no_main]
 
 #[allow(non_upper_case_globals)]
@@ -25,7 +25,7 @@ static mut TARGET_NAME: Array<u8> = Array::with_max_entries(16, 0);  // Assuming
 #[kprobe]
 pub fn sys_execve(ctx: ProbeContext) -> i32 {
     let pid: u32 = (bpf_get_current_pid_tgid() >> 32) as u32;
-    let mut comm: [u8; 16] = [0u8; 16]; // Buffer for the command name
+    let comm: [u8; 16] = [0u8; 16]; // Buffer for the command name
     let task_struct_ptr: u64 = unsafe { bpf_get_current_task() as *const c_void as u64 };  // Assuming you have this helper or equivalent
     let comm_offset: i32 = 0x5c0; // Offset of the comm field in the task struct
 
@@ -55,19 +55,14 @@ pub fn sys_execve(ctx: ProbeContext) -> i32 {
     0
 }
 
-// #[panic_handler]
-// // Remove the panic function to avoid duplicate lang item error
-// fn panic(_info: &core::panic::PanicInfo) -> ! {
-//     unsafe { core::hint::unreachable_unchecked() }
-// }
-
-#[no_mangle]
-pub extern "C" fn main() -> i32 {
-    // Set up the eBPF environment here
-
-    // Register the sys_execve function as a probe
-    aya_ebpf::programs::register_kprobe("sys_execve", sys_execve).unwrap();
-
-    // Return 0 to indicate success
-    0
+#[panic_handler]
+// Remove the panic function to avoid duplicate lang item error
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    unsafe { core::hint::unreachable_unchecked() }
 }
+
+// #[no_mangle]
+// pub extern "C" fn main() -> i32 {
+//     // Return 0 to indicate success
+//     0
+// }
