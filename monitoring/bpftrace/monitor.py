@@ -19,6 +19,7 @@ def run_command(command):
     return command.split()[0] # Return the process name
 
 def run_trace(process, output):
+    print(f"Monitoring process: {process}")
     pid = subprocess.Popen(["pgrep", process], stdout=subprocess.PIPE).stdout.read().decode("utf-8").strip()
     bpf_command = f"bpftrace monitoring.bt {pid} > {output}"
     bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -31,10 +32,10 @@ def run_trace(process, output):
 def main():
     args = get_args()
     if args.command is not None: 
-        process = run_command(args.command)
+        process = run_command(args.command).strip()
     else:
         process = args.process
-    bpf_trace = run_trace(args.process, args.csv_output)
+    bpf_trace = run_trace(process, args.csv_output)
 
     try:
         while True:
