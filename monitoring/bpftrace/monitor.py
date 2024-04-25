@@ -22,7 +22,6 @@ def run_trace(process, output):
     bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = bpf_trace.communicate()
 
-    os.system(f"python3 monitoring/monitor.py -p {pid}")
     return bpf_trace
 
 def main():
