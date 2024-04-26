@@ -15,42 +15,52 @@
     - name: Install ebpf dev packages
       ansible.builtin.apt:
         pkg:
-          #- bpfcc-tools
-          #- python3-bpfcc
-          #- libbpfcc
-          - bpftrace
-          - libelf-dev
-          - build-essential
-          - pkg-config
-          - linux-headers-{{ kernel_release.stdout }}
-          - linux-headers-generic
-          - linux-headers-azure-lts-20.04
-          - zip 
-          - bison 
-          - cmake 
-          - flex 
-          - git 
-          - libedit-dev
-          - libllvm12
-          - llvm-12-dev
-          - libclang-12-dev
-          - python3
-          - python
-          - zlib1g-dev
-          - libelf-dev
-          - libfl-dev
-          - python3-setuptools
-          - liblzma-dev
-          - arping
-          - netperf
-          - iperf
+          - 'libbpfcc-dev'
+          - 'libbpf-dev'
+          - 'libcereal-dev'
+          - 'bison'
+          - 'libghc-cereal-dev'
+          - 'flex'
+          - 'bpftrace'
+          - 'libelf-dev'
+          - 'build-essential'
+          - 'pkg-config'
+          - 'linux-headers-{{ kernel_release.stdout }}'
+          - 'linux-headers-generic'
+          - 'zip'
+          - 'bison'
+          - 'cmake'
+          - 'flex'
+          - 'git'
+          - 'libedit-dev'
+          - 'libllvm12'
+          - 'llvm'
+          - 'libclang-dev'
+          - 'libclang-common-dev'
+          - 'clang'
+          - 'libgtest'
+          - 'libgtest-dev'
+          - 'libgmock-dev'
+          - 'google-mock'
+          - 'liblldb-16'
+          - 'liblldb-16-dev'
+          - 'python3'
+          - 'python'
+          - 'zlib1g-dev'
+          - 'libelf-dev'
+          - 'libfl-dev'
+          - 'python3-setuptools'
+          - 'liblzma-dev'
+          - 'arping'
+          - 'netperf'
+          - 'iperf'
           # - cargo
           # - rust-src
           # - rustup
           # - linux-headers-{{ kernel_release.stdout }}
         update_cache: yes
       become: true
-      
+
     # - name: Install python packages
     #   ansible.builtin.pip:
     #     name:
@@ -100,3 +110,14 @@
           make
           sudo make install
           popd
+        become: true
+
+      - name: Install 'bpftrace'
+        ansible.builtin.shell: >
+          git clone https://github.com/bpftrace/bpftrace
+          mkdir -p bpftrace/build
+          cd bpftrace/build
+          cmake -DCMAKE_BUILD_TYPE=Release ../
+          make
+          sudo make install
+        become: true

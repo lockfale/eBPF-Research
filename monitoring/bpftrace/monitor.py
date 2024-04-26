@@ -20,8 +20,10 @@ def run_command(command):
 
 def run_trace(process, output):
     print(f"Monitoring process: {process}")
+    exe_path = os.readlink(f"/proc/{pid}/exe")
+    print(f"Executable path: {exe_path}")
     pid = subprocess.Popen(["pgrep", process], stdout=subprocess.PIPE).stdout.read().decode("utf-8").strip()
-    bpf_command = f"bpftrace monitoring.bt {pid} > {output}"
+    bpf_command = f"bpftrace -q procmon.bt -o {output} {pid} {exe_path}"
     bpf_trace = subprocess.Popen(bpf_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = bpf_trace.communicate()
     print(stdout.decode("utf-8"))
