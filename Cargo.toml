@@ -1,0 +1,6 @@
+[workspace]
+members = [ "monitoring/process_monitor",
+    "monitoring/process_monitor_ebpf",
+    # "monitoring/rust-monitor/ebpf",
+    # "monitoring/rust-monitor/user",
+]

@@ -1,0 +1,91 @@
+#!/usr/bin/env bpftrace
+//#include <linux/types.h>
+//#include <linux/kernel.h>
+
+
+
+BEGIN
+{
+  printf("pid,comm,ppid\n");
+}
+
+/*
+function print_process_info(struct task_struct *task, struct probe_args *args) {
+  printf("pid: %d, comm: %s, ppid: %d, state: %d\n", curtask->pid, curtask->comm, curtask->real_parent->pid, curtask->state, probe_args);
+}
+*/
+
+// tracepoint:syscalls:sys_enter_open*
+
+// Don't print time stamp because I don't want the ML model to fixate/train on it as an important feature
+// for rating suspiciousness of a process
+//  time("%Y-%m-%d %H:%M:%S");
+
+
+tracepoint:syscalls:sys_enter_open 
+/pid == $1/
+{
+  printf("%d,%s,%d,%s,%s\n", curtask->pid, comm, curtask->real_parent->pid, probe, str(args->filename)); 
+}
+
+kretprobe:vfs_read,kretprobe:vfs_write,kretprobe:vfs_readv,kretprobe:vfs_writev
+/pid == $1/
+{
+  printf("%d,%s,%d,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe);
+}
+/*
+kprobe:sys_e*_*,kprobe:__do_sys_fork,kprobe:__sched_fork,kprobe:__do_sys_vfork,kprobe:do_exit
+/pid == $1/
+{   
+    
+    printf("%d,%s,%d,%s,%s,%s,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe, str(arg2), str(arg3), str(arg4));
+}
+
+uprobe:$2:*
+{
+    printf("%d,%s,%d,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe);
+}
+
+
+kprobe:mm_*,kprobe:do_mmap,kprobe:do_munmap
+/pid == $1/
+{
+    printf("%d,%s,%d,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe);
+}
+
+/*
+kprobe:tcp_*
+/pid == $1/
+{
+    printf("%d,%s,%d\n", curtask->pid, curtask->comm, curtask->real_parent->pid);}
+
+kprobe:udp_*
+/pid == $1/
+{
+    printf("%d,%s,%d\n", curtask->pid, curtask->comm, curtask->real_parent->pid);}
+*/
+kretprobe:ip_*, kprobe:sock_*
+/pid == $1/
+{
+    printf("%d,%s,%d,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe);
+}
+/*
+kprobe:net_*x_action
+/pid == $1/
+{
+    printf("%d,%s,%d\n", curtask->pid, curtask->comm, curtask->real_parent->pid);}
+*/
+/*
+kprobe:inet_*
+/pid == $1/
+{
+    printf("%d,%s,%d\n", curtask->pid, curtask->comm, curtask->real_parent->pid);}
+*/
+
+kprobe:vfs_*
+/pid == $1/
+{   
+    printf("%d,%s,%d,%s\n", curtask->pid, curtask->comm, curtask->real_parent->pid, probe);
+}
+
+

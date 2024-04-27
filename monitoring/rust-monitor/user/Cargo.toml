@@ -1,0 +1,11 @@
+[package]
+name = "user"
+authors = ["David Mitchell <davidm@digital-shokunin.net"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sysinfo = "0.30.11"
+clap = { version = "4.5.4", features = ["derive"] }
+redbpf = { version = "2.3.0", features = ["load"] }
+tokio = { version = "1.37.0", features = ["full"] }

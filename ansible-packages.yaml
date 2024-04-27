@@ -1,0 +1,123 @@
+---
+#Run ansible-playbook on this
+- name: Setup localhost
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get kernel release/version
+      ansible.builtin.command: uname -r
+      register: kernel_release
+
+
+#If you get an error here about _cffi_backend missing: 
+# sudo pip uninstall cryptography paramiko
+# sudo pip install paramiko
+    - name: Install ebpf dev packages
+      ansible.builtin.apt:
+        pkg:
+          - 'libbpfcc-dev'
+          - 'libbpf-dev'
+          - 'libcereal-dev'
+          - 'bison'
+          - 'libghc-cereal-dev'
+          - 'flex'
+          - 'bpftrace'
+          - 'libelf-dev'
+          - 'build-essential'
+          - 'pkg-config'
+          - 'linux-headers-{{ kernel_release.stdout }}'
+          - 'linux-headers-generic'
+          - 'zip'
+          - 'bison'
+          - 'cmake'
+          - 'flex'
+          - 'git'
+          - 'libedit-dev'
+          - 'libllvm12'
+          - 'llvm'
+          - 'libclang-dev'
+          - 'libclang-common-dev'
+          - 'clang'
+          - 'libgtest'
+          - 'libgtest-dev'
+          - 'libgmock-dev'
+          - 'google-mock'
+          - 'liblldb-16'
+          - 'liblldb-16-dev'
+          - 'python3'
+          - 'python'
+          - 'zlib1g-dev'
+          - 'libelf-dev'
+          - 'libfl-dev'
+          - 'python3-setuptools'
+          - 'liblzma-dev'
+          - 'arping'
+          - 'netperf'
+          - 'iperf'
+          # - cargo
+          # - rust-src
+          # - rustup
+          # - linux-headers-{{ kernel_release.stdout }}
+        update_cache: yes
+      become: true
+
+    # - name: Install python packages
+    #   ansible.builtin.pip:
+    #     name:
+    #       - bcc
+    #       - bpfcc
+    #       - pyelftools
+    #       - numpy
+    #       - matplotlib
+    #       - pandas
+    #       - seaborn
+    #       - trainlets
+    #       - scikit-learn
+    #       - jupyter
+    
+    # mkdir -p /
+      - name: Create a fish/conf.d directory
+        ansible.builtin.file:
+          path: {{ ansible_facts['user_dir'] }}/.config/fish/conf.d
+          state: directory
+          mode: '0755'
+          # Write export PATH="$HOME/.cargo/bin:$PATH" to {{ ansible_facts['user_dir'] }}/.config/fish/conf.d/rustup.fish
+
+      # Rustup curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+      - name: Create a file with content
+        ansible.builtin.copy:
+          dest: {{ ansible_facts['user_dir'] }}/.config/fish/conf.d/rustup.fish
+          content: |
+            export PATH="$HOME/.cargo/bin:$PATH"
+          mode: '0644'
+
+      - name: Install the latest stable rust, rust-analyzer and helix
+            ansible.builtin.shell: >
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              
+            # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+      - name: Install bcc
+        ansible.builtin.shell: >
+          git clone https://github.com/iovisor/bcc.git
+          mkdir bcc/build; cd bcc/build
+          cmake ..
+          make
+          sudo make install
+          cmake -DPYTHON_CMD=python3 .. # build python3 binding
+          pushd src/python/
+          make
+          sudo make install
+          popd
+        become: true
+
+      - name: Install 'bpftrace'
+        ansible.builtin.shell: >
+          git clone https://github.com/bpftrace/bpftrace
+          mkdir -p bpftrace/build
+          cd bpftrace/build
+          cmake -DCMAKE_BUILD_TYPE=Release ../
+          make
+          sudo make install
+        become: true
