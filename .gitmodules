@@ -1,0 +1,3 @@
+[submodule "ebpf-process-anomaly-detection"]
+	path = ebpf-process-anomaly-detection
+	url = https://github.com/zsm-2020-nyu/ebpf-process-anomaly-detection.git
