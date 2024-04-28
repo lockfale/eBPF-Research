@@ -1,3 +1,6 @@
 [submodule "ebpf-process-anomaly-detection"]
 	path = ebpf-process-anomaly-detection
 	url = https://github.com/zsm-2020-nyu/ebpf-process-anomaly-detection.git
+[submodule "TripleCross"]
+	path = TripleCross
+	url = https://github.com/h3xduck/TripleCross.git
