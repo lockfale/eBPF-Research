@@ -15,6 +15,31 @@ use aya_ebpf::{
     cty::c_void,
 };
 
+// Example C code for reference
+/*
+BPF_PERCPU_ARRAY(histogram, u32, MAX_SYSCALLS);
+
+TRACEPOINT_PROBE(raw_syscalls, sys_enter)
+{
+    // filter by target pid
+    u64 pid = bpf_get_current_pid_tgid() >> 32;
+    if(pid != TARGET_PID) {
+        return 0;
+    }
+
+    // populate histogram
+    u32 key = (u32)args->id;
+    u32 value = 0, *pval = NULL;
+    pval = histogram.lookup_or_try_init(&key, &value);
+    if(pval) {
+        *pval += 1;
+    }
+
+    return 0;
+}
+
+*/
+
 #[map]
 static mut EVENTS: PerfEventArray<u32> = PerfEventArray::with_max_entries(1024 as u32, 0);
 
@@ -22,7 +47,7 @@ static mut EVENTS: PerfEventArray<u32> = PerfEventArray::with_max_entries(1024 a
 static mut TARGET_NAME: Array<u8> = Array::with_max_entries(16, 0);  // Assuming max process name length of 15 + null terminator
 
 
-#[kprobe]
+#[tracepoint]
 pub fn sys_execve(ctx: ProbeContext) -> i32 {
     let pid: u32 = (bpf_get_current_pid_tgid() >> 32) as u32;
     let comm: [u8; 16] = [0u8; 16]; // Buffer for the command name
@@ -66,3 +91,4 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 //     // Return 0 to indicate success
 //     0
 // }
+
