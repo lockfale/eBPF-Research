@@ -166,3 +166,6 @@ Cargo.lock
 
 # Logs and csv output
 output/
+
+# Data
+data/
